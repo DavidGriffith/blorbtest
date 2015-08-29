@@ -8,10 +8,6 @@
 #include <string.h>
 #include <sndfile.h>
 
-#ifdef WITH_AO
-#include <ao/ao.h>
-#endif
-
 #define BUFFSIZE 4096
 
 int playfile(FILE *);
@@ -54,17 +50,6 @@ int playfile(FILE *fp)
     SNDFILE     *outfile;
     SF_INFO     outfile_info;
 
-#ifdef WITH_AO
-    int default_driver;
-    ao_device *device;
-    ao_sample_format format;
-
-    ao_initialize();
-    default_driver = ao_default_driver_id();
-    memset(&format, 0, sizeof(ao_sample_format));
-    sf_info.format = 0;
-#endif
-
     filestart = ftell(fp);
 
     memset(&sf_info, 0, sizeof(SF_INFO));
@@ -77,19 +62,6 @@ int playfile(FILE *fp)
     outfile_info.samplerate = sf_info.samplerate;
 
     outfile = sf_open("sampleout.aiff", SFM_WRITE, &outfile_info);
-
-#ifdef WITH_AO
-    format.byte_format = AO_FMT_NATIVE;
-    format.bits = 32;
-    format.channels = sf_info.channels;
-    format.rate = sf_info.samplerate;
-
-    device = ao_open_live(default_driver, &format, NULL /* no options */);
-    if (device == NULL) {
-        printf("Error opening sound device.\n");
-        return 1;
-    }
-#endif
 
     buffer = malloc(BUFFSIZE * sf_info.channels * sizeof(int));
     frames_read = 0;
@@ -112,20 +84,11 @@ int playfile(FILE *fp)
         total_read += frames_read;
 	printf("frames read:      %d\n", frames_read);
 	printf("frames remaining: %d\n\n", toread);
-
-#ifdef WITH_AO
-        ao_play(device, (char *)buffer, frames_read * sizeof(int));
-#endif
     }
 
     fseek(fp, filestart, SEEK_SET);
     sf_close(sndfile);
     free(buffer);
-
-#ifdef WITH_AO
-    ao_close(device);
-    ao_shutdown();
-#endif
 
     printf("Read:    %d\n", total_read);
     printf("Written: %d\n", total_written);

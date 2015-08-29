@@ -12,12 +12,6 @@
 #include <math.h>
 #include <sndfile.h>
 
-#ifdef WITH_AO
-  #include <ao/ao.h>
-  ao_device *device;
-  ao_sample_format format;
-#endif
-
 #include "blorb.h"
 #include "blorblow.h"
 
@@ -96,15 +90,6 @@ int playsample(FILE *fp, bb_result_t result)
     SNDFILE	*outfile = NULL;
     SF_INFO	outfile_info;
 
-#ifdef WITH_AO
-    int default_driver;
-    ao_device *device;
-    ao_sample_format format;
-
-    ao_initialize();
-    default_driver = ao_default_driver_id();
-    memset(&format, 0, sizeof(ao_sample_format));
-#endif
 
     memset(&sf_info, 0, sizeof(SF_INFO));
     memset(&outfile_info, 0, sizeof(SF_INFO));
@@ -126,19 +111,6 @@ int playsample(FILE *fp, bb_result_t result)
     printf("  Samples:        %d\n", (int) sf_info.frames * sf_info.channels);
     printf("Processing\n");
 
-#ifdef WITH_AO
-    format.byte_format = AO_FMT_NATIVE;
-    format.bits = 32;
-    format.channels = sf_info.channels;
-    format.rate = sf_info.samplerate;
-    device = ao_open_live(default_driver, &format, NULL /* no options */);
-
-    if (device == NULL) {
-        printf("Error opening sound device.\n");
-        return 1;
-    }
-#endif
-
     buffer = malloc(BUFFSIZE * sf_info.channels * sizeof(int));
     frames_read = 0;
     toread = sf_info.frames * sf_info.channels;
@@ -155,10 +127,6 @@ int playsample(FILE *fp, bb_result_t result)
 	total_read += frames_read;
 	total_written += frames_written;
 	printf("  Reading:        %d\n", frames_read);
-
-#ifdef WITH_AO
-	ao_play(device, (char *)buffer, frames_read * sizeof(int));
-#endif
     }
     printf("Finished\n");
     printf("  Total read:     %d\n", total_read);
@@ -167,11 +135,6 @@ int playsample(FILE *fp, bb_result_t result)
     free(buffer);
     fseek(fp, filestart, SEEK_SET);
     sf_close(sndfile);
-
-#ifdef WITH_AO
-    ao_close(device);
-    ao_shutdown();
-#endif
 
     return 0;
 }

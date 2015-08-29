@@ -28,10 +28,6 @@ conveniently, here:
 https://github.com/DavidGriffith/inform6unix/blob/master/contrib/cblorb.c
 
 
-If you uncomment the "#define WITH_AO" in the programs and "AUDIO_LIBS" 
-in the Makefile, these programs will also attempt to play the data they 
-read by way of LibAO (https://www.xiph.org/ao/).
-
 The Blorb format is an IFF format container.  For more information, see:
 https://en.wikipedia.org/wiki/Blorb and
 http://www.eblong.com/zarf/blorb/blorb.html
