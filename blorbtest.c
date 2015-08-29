@@ -99,6 +99,11 @@ int playsample(FILE *fp, bb_result_t result)
     lseek(fileno(fp), result.data.startpos, SEEK_SET);
     sndfile = sf_open_fd(fileno(fp), SFM_READ, &sf_info, 0);
 
+    if (! sndfile) {
+	printf ("playsample : %s\n", sf_strerror (sndfile));
+	return 0;
+    }
+
     outfile_info.format = SF_FORMAT_AIFF | SF_FORMAT_PCM_S8;
     outfile_info.channels = sf_info.channels;
     outfile_info.samplerate = sf_info.samplerate;
