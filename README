@@ -1,0 +1,37 @@
+Here are two test programs intended to explore an ongoing problem of not 
+being able to make libsndfile read an OGGV file from an IFF container.  
+
+sampletest <filename>
+This program simply loads an audio file and writes it out again as 
+"sampleout.aiff".  It'll take, at least, WAV, AIFF, or OGGV
+
+blorbtest <filename> <sound resource number>
+This program loads a Blorb file, reads the indicated sound resource 
+number, and writes it out as "blorbout.aiff".  If the sound resource 
+happens to be a MOD, we just ignore it and exit.
+
+Test Files:
+
+buzzer.aiff and boothead.ogg
+Short audio samples in AIFF and OGGV formats.
+
+test.blorb
+This is the IFF container.  It contains the two audio files described.  
+Sound resource numbers begin at 3.  This means that resource numbers 3 
+and 4 are valid.  All others are not.
+
+test.blurb
+This was used to generate the above Blorb file.  The program that 
+generates the Blorb is found here: 
+http://inform7.com/sources/src/cBlorb/Woven/index.html or more 
+conveniently, here:
+https://github.com/DavidGriffith/inform6unix/blob/master/contrib/cblorb.c
+
+
+If you uncomment the "#define WITH_AO" in the programs and "AUDIO_LIBS" 
+in the Makefile, these programs will also attempt to play the data they 
+read by way of LibAO (https://www.xiph.org/ao/).
+
+The Blorb format is an IFF format container.  For more information, see:
+https://en.wikipedia.org/wiki/Blorb and
+http://www.eblong.com/zarf/blorb/blorb.html
